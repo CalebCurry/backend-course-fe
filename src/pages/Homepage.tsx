@@ -7,10 +7,10 @@ import { backendUrl } from '../shared';
 const Homepage = () => {
     const { isLoggedIn } = useContext(AuthContext);
     
-    const [files, setFiles] = useState([]);
-    const [file, setFile] = useState(null);
+    const [files, setFiles] = useState<{ file: string, name: string }[]>([]);
+    const [file, setFile] = useState<File | null>(null);
     const [fileName, setFileName] = useState('');
-    const [preview, setPreview] = useState(null);
+    const [preview, setPreview] = useState<string | null>(null);
 
     useEffect(() => {
         // Fetch files from the backend
@@ -19,24 +19,29 @@ const Homepage = () => {
             .catch(error => console.error('Error fetching files:', error));
     }, []);
 
-    const handleFileChange = (event) => {
-        const selectedFile = event.target.files[0];
-        setFile(selectedFile);
-        setPreview(URL.createObjectURL(selectedFile));
+    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        if (event.target.files && event.target.files.length > 0) {
+            const selectedFile = event.target.files[0];
+            setFile(selectedFile);
+            setPreview(URL.createObjectURL(selectedFile));
+        }
     };
 
-    const handleNameChange = (event) => {
+    const handleNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setFileName(event.target.value);
     };
 
-    const handleSubmit = (event) => {
+
+    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         const formData = new FormData();
-        formData.append('file', file);
+        if (file) {
+            formData.append('file', file);
+        }
         formData.append('name', fileName);
 
         // Upload file to the backend
-        axios.post(backendUrl + '/api/files/', formData)
+        axios.post<{ file: string, name: string }>(backendUrl + '/api/files/', formData)
             .then(response => {
                 // Refresh the files list
                 setFiles([...files, response.data]);

@@ -1,4 +1,4 @@
-import { useState, createContext, useEffect, useContext, ReactNode } from 'react';
+import { useState, createContext, useEffect, useContext, ReactNode, useCallback } from 'react';
 import axios from 'axios';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import './App.css';
@@ -9,7 +9,19 @@ import MenuBar from './components/MenuBar';
 import HomePage from './pages/Homepage';
 import { backendUrl } from './shared';
 
-export const AuthContext = createContext(null);
+type AuthContextType = {
+  isLoggedIn: boolean;
+  logout: () => void;
+  login: (username: string, password: string) => Promise<void>;
+  tokenInfo: TokenInfo;
+};
+
+export const AuthContext = createContext<AuthContextType>({
+  isLoggedIn: false,
+  logout: () => {},
+  login: async () => {},
+  tokenInfo: null,
+});
 
 type TokenInfo = {
   access: string;
@@ -41,37 +53,37 @@ function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const logout = () => {
+  const logout = useCallback(() => {
     console.log("logging out")
     localStorage.removeItem('access');
     localStorage.removeItem('refresh');
     setIsLoggedIn(false);
     setTokenInfo(null);
-  };
+  }, []);
 
-  const refreshAccessToken = async () => {
-    if (isRefreshing) return;
-    setIsRefreshing(true);
-    try {
-      const refresh = localStorage.getItem('refresh');
-      const response = await axios.post(`${backendUrl}/api/auth/refresh/`, { refresh });
-
-      if (response.status === 200) {
-        console.log('updating tokens')
-        localStorage.setItem('access', response.data.access);
-        localStorage.setItem('refresh', response.data.refresh);
-        setTokenInfo({ access: response.data.access, refresh: response.data.refresh });
-        setIsRefreshing(false);
-        return response.data.access;
-      } else {
+  const refreshAccessToken = useCallback(async () => {
+      if (isRefreshing) return;
+      setIsRefreshing(true);
+      try {
+        const refresh = localStorage.getItem('refresh');
+        const response = await axios.post(`${backendUrl}/api/auth/refresh/`, { refresh });
+  
+        if (response.status === 200) {
+          console.log('updating tokens')
+          localStorage.setItem('access', response.data.access);
+          localStorage.setItem('refresh', response.data.refresh);
+          setTokenInfo({ access: response.data.access, refresh: response.data.refresh });
+          setIsRefreshing(false);
+          return response.data.access;
+        } else {
+          logout();
+        }
+      } catch{
         logout();
+      } finally {
+        setIsRefreshing(false);
       }
-    } catch{
-      logout();
-    } finally {
-      setIsRefreshing(false);
-    }
-  };
+    }, [isRefreshing, logout]);
 
   const checkLoginStatus = () => {
     const access = localStorage.getItem('access');

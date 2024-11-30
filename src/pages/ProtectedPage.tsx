@@ -5,7 +5,7 @@ import axios from 'axios';
 const backendUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
 export default function ProtectedContent() {
-  const { isLoggedIn, logout, login, tokenInfo } = useContext(AuthContext);
+  const { tokenInfo } = useContext(AuthContext);
 
   const handleProtectedAction = async () => {
     try {
@@ -20,7 +20,7 @@ export default function ProtectedContent() {
     <div>
       <div>
         <h3>Access Token:</h3>
-        <pre>...{tokenInfo.access.substring(210)}</pre>
+        <pre>...{tokenInfo?.access?.substring(210)}</pre>
       </div>
       <div>
         <h3>Refresh Token:</h3>
