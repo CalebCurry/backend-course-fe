@@ -1,9 +1,10 @@
-import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { useContext } from 'react';
 import { AuthContext } from '../context/Context';
 
-function ProtectedRoute({ children }) {
+import { ReactNode } from 'react';
+
+function ProtectedRoute({ children }: { children: ReactNode }) {
   const { isLoggedIn } = useContext(AuthContext);
 
   // Redirect to login if not authenticated

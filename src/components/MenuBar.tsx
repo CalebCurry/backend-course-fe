@@ -10,7 +10,7 @@ const MenuBar = () => {
         <div className="menuBar">
             <div className="left">
                 <Link to="/" className="link">Home</Link>
-                { isLoggedIn ? <Link to="/protected" className="link">Protected</Link> : <></> }
+                { isLoggedIn ? <Link to="/protected" className="link">Protected</Link> : <><Link to="/register" className="link">Register</Link> </> }
             </div>
             <div className="right">
                 { isLoggedIn ? <button onClick={logout} className="button">Logout</button> : <></> }
