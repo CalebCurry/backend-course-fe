@@ -1,6 +1,6 @@
 import { useState, useContext } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { AuthContext } from '../App';
+import { AuthContext } from '../context/Context';
 
 function LoginForm() {
   const [username, setUsername] = useState('');

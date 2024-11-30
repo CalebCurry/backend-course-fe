@@ -1,7 +1,7 @@
 import { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AuthContext } from '../App';
 import { backendUrl } from '../shared';
+import { AuthContext } from '../context/Context';
 
 function RegisterForm() {
   const [username, setUsername] = useState('');

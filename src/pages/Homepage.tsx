@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
-import { AuthContext } from '../App';
 import { Link } from 'react-router-dom';
 import { backendUrl } from '../shared';
+import { AuthContext } from '../context/Context';
 
 const Homepage = () => {
     const { isLoggedIn } = useContext(AuthContext);
