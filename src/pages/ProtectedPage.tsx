@@ -1,5 +1,5 @@
 import { useContext } from 'react';
-import axios from 'axios';
+import axios from "../Axios";
 import { AuthContext } from '../context/Context';
 
 const backendUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';

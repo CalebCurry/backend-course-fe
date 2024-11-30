@@ -16,6 +16,8 @@ function App() {
 
   return (
     <Router>
+
+    <AuthProvider>
       <MenuBar />
       <Routes>
         <Route path="/" element={<HomePage />} />
@@ -23,14 +25,14 @@ function App() {
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/protected" element={isLoggedIn ? <ProtectedPage /> : <Navigate to="/login" />} />
         </Routes>
-    </Router>
+
+    </AuthProvider>
+    </Router> 
   );
 }
 
 export default function Root() {
   return (
-    <AuthProvider>
       <App />
-    </AuthProvider>
   );
 }
