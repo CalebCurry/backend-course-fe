@@ -8,12 +8,14 @@ import MenuBar from './components/MenuBar';
 import HomePage from './pages/Homepage';
 import { AuthContext } from './context/Context';
 import AuthProvider from './context/Provider';
-
+// import { createBrowserHistory } from 'history';
+import ProtectedRoute from './components/ProtectedRoute';
 
 
 function App() {
   const { isLoggedIn } = useContext(AuthContext);
 
+  // const history = createBrowserHistory();
   return (
     <Router>
 
@@ -23,7 +25,14 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
-        <Route path="/protected" element={isLoggedIn ? <ProtectedPage /> : <Navigate to="/login" />} />
+        <Route
+            path="/protected"
+            element={
+              <ProtectedRoute>
+                <ProtectedPage />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
 
     </AuthProvider>

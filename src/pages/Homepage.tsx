@@ -13,11 +13,14 @@ const Homepage = () => {
     const [preview, setPreview] = useState<string | null>(null);
 
     useEffect(() => {
+        if(!isLoggedIn){
+            return;
+        }
         // Fetch files from the backend
         axios.get(backendUrl + '/api/files/')
             .then(response => setFiles(response.data.files))
             .catch(error => console.error('Error fetching files:', error));
-    }, []);
+    }, [isLoggedIn]);
 
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (event.target.files && event.target.files.length > 0) {

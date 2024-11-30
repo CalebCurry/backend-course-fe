@@ -5,7 +5,9 @@ import { AuthContext } from '../context/Context';
 const backendUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
 export default function ProtectedContent() {
+
   const { tokenInfo } = useContext(AuthContext);
+  console.log("protected content. tokenInfo: ", tokenInfo);
 
   const handleProtectedAction = async () => {
     try {

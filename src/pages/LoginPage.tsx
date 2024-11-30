@@ -12,6 +12,7 @@ function LoginForm() {
     e.preventDefault();
     await login(username, password);
     //TODO navigate to previous page
+    console.log("about to navigate to /protected")
     navigate('/protected');
   };
 
