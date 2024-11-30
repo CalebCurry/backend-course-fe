@@ -1,7 +1,43 @@
+body {
+  display: block;
+}
+
+.menuBar {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 20px;
+  background-color: #333;
+  color: #fff;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.left {
+  display: flex;
+  gap: 10px;
+}
+
+.right {}
+
+.link {
+  color: #fff;
+  text-decoration: none;
+}
+
+.button {
+  background-color: #f44336;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+}
+
 #root {
   max-width: 1280px;
   margin: 0 auto;
-  padding: 2rem;
   text-align: center;
 }
 
@@ -76,8 +112,9 @@ button {
   border-radius: 4px;
   cursor: pointer;
   transition: background-color 0.3s;
+  margin: 0.5rem;
 }
 
 button:hover {
   background-color: #0056b3;
-}
+} 

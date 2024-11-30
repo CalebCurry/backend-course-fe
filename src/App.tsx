@@ -1,21 +1,27 @@
-import { useState, createContext, useContext, useEffect } from 'react'
-import axios from 'axios'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState, createContext, useEffect, useContext, ReactNode } from 'react';
+import axios from 'axios';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import './App.css';
+import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
+import ProtectedPage from './pages/ProtectedPage';
+import MenuBar from './components/MenuBar';
+import HomePage from './pages/Homepage';
+import { backendUrl } from './shared';
 
-const AuthContext = createContext({ isLoggedIn: false, handleLogin: () => {}, handleLogout: () => {} });
+export const AuthContext = createContext(null);
 
-import { ReactNode } from 'react';
-
-const backendUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+type TokenInfo = {
+  access: string;
+  refresh: string;
+} | null;
 
 function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [tokenInfo, setTokenInfo] = useState({ access: '', refresh: '' });
+  const [tokenInfo, setTokenInfo] = useState<TokenInfo>({ access: '', refresh: '' });
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-  const handleLogin = async (username: string, password: string) => {
+  const login = async (username: string, password: string) => {
     try {
       const response = await axios.post(`${backendUrl}/api/auth/login/`, {
         username,
@@ -35,11 +41,12 @@ function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const handleLogout = () => {
+  const logout = () => {
+    console.log("logging out")
     localStorage.removeItem('access');
     localStorage.removeItem('refresh');
     setIsLoggedIn(false);
-    setTokenInfo({ access: '', refresh: '' });
+    setTokenInfo(null);
   };
 
   const refreshAccessToken = async () => {
@@ -57,10 +64,10 @@ function AuthProvider({ children }: { children: ReactNode }) {
         setIsRefreshing(false);
         return response.data.access;
       } else {
-        handleLogout();
+        logout();
       }
-    } catch (error) {
-      handleLogout();
+    } catch{
+      logout();
     } finally {
       setIsRefreshing(false);
     }
@@ -111,96 +118,28 @@ function AuthProvider({ children }: { children: ReactNode }) {
       axios.interceptors.request.eject(requestInterceptor);
       axios.interceptors.response.eject(responseInterceptor);
     };
-  }, [refreshAccessToken, handleLogout]);
+  }, [refreshAccessToken, logout]);
 
   return (
-    <AuthContext.Provider value={{ isLoggedIn, handleLogin, handleLogout, tokenInfo }}>
+    <AuthContext.Provider value={{ isLoggedIn, logout, login, tokenInfo }}>
       {children}
     </AuthContext.Provider>
   );
 }
 
-function LoginForm() {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const { handleLogin } = useContext(AuthContext);
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    handleLogin(username, password);
-  };
-
-  return (
-    <form onSubmit={handleSubmit}>
-      <div>
-        <label>
-          Username:
-          <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} />
-        </label>
-      </div>
-      <div>
-        <label>
-          Password:
-          <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
-        </label>
-      </div>
-      <button type="submit">Login</button>
-    </form>
-  );
-}
-
-function ProtectedContent() {
-  const { tokenInfo } = useContext(AuthContext);
-
-  const handleRestrictedAction = async () => {
-    try {
-      const response = await axios.get(`${backendUrl}/api/files`);
-      console.log('Restricted action response:', response.data);
-    } catch (error) {
-      console.error('Restricted action failed', error);
-    }
-  };
-
-  return (
-    <div>
-      <div>
-        <h3>Access Token:</h3>
-        <pre>...{tokenInfo.access.substring(210)}</pre>
-      </div>
-      <div>
-        <h3>Refresh Token:</h3>
-        <pre>...{tokenInfo?.refresh?.substring(210)}</pre>
-      </div>
-      <button onClick={handleRestrictedAction}>Restricted Action</button>
-    </div>
-  );
-}
-
 function App() {
-  const { isLoggedIn, handleLogout } = useContext(AuthContext);
+  const { isLoggedIn } = useContext(AuthContext);
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Authentication</h1>
-      <div className="card">
-        {isLoggedIn ? (
-          <>
-            <button onClick={handleLogout}>Logout</button>
-            <ProtectedContent />
-          </>
-        ) : (
-          <LoginForm />
-        )}
-      </div>
-    </>
+    <Router>
+      <MenuBar />
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/protected" element={isLoggedIn ? <ProtectedPage /> : <Navigate to="/login" />} />
+        </Routes>
+    </Router>
   );
 }
 
